@@ -6,9 +6,9 @@
       <div class="container">
 
         <!-- Logo -->
-        <router-link class="navbar-brand fw-bold fs-4" to="/">
+        <a class="navbar-brand fw-bold fs-4" href="#" @click.prevent="currentPage = 'home'">
           🚀 FPT Blog
-        </router-link>
+        </a>
 
         <!-- Toggle mobile -->
         <button
@@ -25,15 +25,15 @@
           <ul class="navbar-nav me-auto">
 
             <li class="nav-item">
-              <router-link class="nav-link" to="/">
+              <a class="nav-link" href="#" @click.prevent="currentPage = 'home'">
                 Trang chủ
-              </router-link>
+              </a>
             </li>
 
             <li class="nav-item" v-if="isLoggedIn">
-              <router-link class="nav-link" to="/create-post">
+              <a class="nav-link" href="#" @click.prevent="currentPage = 'create-post'">
                 Đăng bài
-              </router-link>
+              </a>
             </li>
 
           </ul>
@@ -41,26 +41,24 @@
           <!-- Right menu -->
           <ul class="navbar-nav align-items-lg-center">
 
-            <!-- Chưa đăng nhập -->
             <template v-if="!isLoggedIn">
               <li class="nav-item">
-                <router-link class="nav-link" to="/register">
+                <a class="nav-link" href="#" @click.prevent="currentPage = 'register'">
                   Đăng ký
-                </router-link>
+                </a>
               </li>
               <li class="nav-item">
-                <router-link class="nav-link login-btn" to="/login">
+                <a class="nav-link login-btn" href="#" @click.prevent="currentPage = 'login'">
                   Đăng nhập
-                </router-link>
+                </a>
               </li>
             </template>
 
-            <!-- Đã đăng nhập -->
             <template v-else>
               <li class="nav-item">
-                <router-link class="nav-link user-name" to="/profile">
+                <span class="nav-link user-name">
                   👋 {{ userName }}
-                </router-link>
+                </span>
               </li>
               <li class="nav-item">
                 <button
@@ -80,7 +78,23 @@
     <!-- MAIN CONTENT -->
     <main class="flex-grow-1 py-4">
       <div class="container">
-        <router-view @login-success="checkLoginStatus" />
+
+        <div v-if="currentPage === 'home'">
+          <h2>Trang chủ</h2>
+        </div>
+
+        <div v-if="currentPage === 'login'">
+          <h2>Trang đăng nhập</h2>
+        </div>
+
+        <div v-if="currentPage === 'register'">
+          <h2>Trang đăng ký</h2>
+        </div>
+
+        <div v-if="currentPage === 'create-post'">
+          <h2>Trang đăng bài</h2>
+        </div>
+
       </div>
     </main>
 
@@ -98,14 +112,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-
-const router = useRouter()
-const route = useRoute()
+import { ref, onMounted } from 'vue'
 
 const isLoggedIn = ref(false)
 const userName = ref('')
+const currentPage = ref('home')
 
 const checkLoginStatus = () => {
   const user = JSON.parse(localStorage.getItem('user'))
@@ -123,22 +134,16 @@ onMounted(() => {
   checkLoginStatus()
 })
 
-watch(() => route.fullPath, () => {
-  checkLoginStatus()
-})
-
 const handleLogout = () => {
   if (confirm("Bạn có chắc muốn đăng xuất?")) {
     localStorage.removeItem('user')
     checkLoginStatus()
-    router.push('/login')
+    currentPage.value = 'login'
   }
 }
 </script>
 
 <style scoped>
-
-/* ===== NAVBAR ===== */
 .custom-navbar {
   background: linear-gradient(90deg, #1e3c72, #2a5298);
 }
@@ -153,37 +158,18 @@ const handleLogout = () => {
   transform: translateY(-2px);
 }
 
-.router-link-active {
-  color: #00f2fe !important;
-  font-weight: 600;
-}
-
-/* Login button */
 .login-btn {
   color: #00f2fe !important;
   font-weight: 500;
 }
 
-/* Username */
 .user-name {
   font-weight: 600;
   color: #fff !important;
 }
 
-/* ===== FOOTER ===== */
 .footer {
   background: #f8f9fa;
   border-top: 1px solid #ddd;
 }
-
-/* Smooth fade */
-main {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 </style>
